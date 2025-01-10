@@ -27,14 +27,24 @@ export default function HomeScreen() {
                 <HelloWave/>
             </ThemedView>
             <ThemedView>
-                <Accordion type="single">
+                <Accordion type="multiple">
                     <AccordionItem value="item-1">
                         <AccordionTrigger>
-                            <Text>What API am I using ?</Text>
+                            <Text>What API am I using?</Text>
                         </AccordionTrigger>
                         <AccordionContent>
                             <Text>We are using <Link href="https://openweathermap.org/" className="underline">Open
                                 Weather</Link>.
+                            </Text>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-2">
+                        <AccordionTrigger>
+                            <Text>Who am I?</Text>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                            <Text>
+                                I am Raphaël also known as <Link href="https://github.com/Raxuis" className="underline">Raxuis</Link>.
                             </Text>
                         </AccordionContent>
                     </AccordionItem>
