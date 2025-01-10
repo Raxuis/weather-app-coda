@@ -1,4 +1,4 @@
-import {StyleSheet, Image, View} from 'react-native';
+import {StyleSheet, Image} from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
@@ -9,6 +9,8 @@ import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/Card";
 import {
+    ArrowDown,
+    ArrowUp,
     Droplet,
     WindIcon
 } from "lucide-react-native";
@@ -124,7 +126,23 @@ export default function TabTwoScreen() {
                         <Card className="w-full">
                             <CardHeader>
                                 <CardTitle>{weatherData.name}</CardTitle>
-                                <CardDescription>{weatherData.weather[0].description}</CardDescription>
+                                <CardDescription>
+                                    {weatherData.weather[0].description}
+                                </CardDescription>
+                                <ThemedView className="flex flex-row gap-2">
+                                    <ThemedView className="flex flex-row items-center gap-1">
+                                        <ArrowDown size={20} color="blue"/>
+                                        <Text className="text-blue-600">
+                                            {weatherData.main.temp_min}°C
+                                        </Text>
+                                    </ThemedView>
+                                    <ThemedView className="flex flex-row items-center gap-1">
+                                        <ArrowUp size={20} color="red"/>
+                                        <Text className="text-red-500">
+                                            {weatherData.main.temp_max}°C
+                                        </Text>
+                                    </ThemedView>
+                                </ThemedView>
                             </CardHeader>
                             <CardContent className="flex flex-col items-center">
                                 <Image
