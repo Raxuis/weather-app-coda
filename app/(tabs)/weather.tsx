@@ -1,4 +1,4 @@
-import {StyleSheet, Image} from 'react-native';
+import {StyleSheet, Image, View} from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
@@ -12,6 +12,7 @@ import {
     ArrowDown,
     ArrowUp,
     Droplet,
+    LoaderCircleIcon,
     WindIcon
 } from "lucide-react-native";
 
@@ -53,6 +54,7 @@ export default function TabTwoScreen() {
     const [city, setCity] = useState<string>("");
     const [weatherData, setWeatherData] = useState<WeatherData>();
     const [iconUrl, setIconUrl] = useState<string>();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const iconMap: Record<string, any> = {
         "clouds.png": require('@/assets/images/clouds.png'),
@@ -65,6 +67,7 @@ export default function TabTwoScreen() {
 
 
     const fetchWeatherDatas = async () => {
+        setIsLoading(true);
         const apiKey = process.env.API_KEY!;
         const apiURL = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
         await axios
@@ -73,8 +76,8 @@ export default function TabTwoScreen() {
                 console.log(res.data);
                 setWeatherData(res.data);
             })
-            .catch(error => console.log(error));
-
+            .catch(error => console.log(error))
+            .finally(() => setIsLoading(false));
     }
 
     useEffect(() => {
@@ -116,57 +119,63 @@ export default function TabTwoScreen() {
                     defaultValue={city}
                     onChangeText={city => setCity(city)}
                 />
-                <Button className="mt-2" variant="destructive" onPress={fetchWeatherDatas}>
+                <Button className="mt-2" variant="destructive" onPress={fetchWeatherDatas} disabled={isLoading}>
                     <Text>Submit</Text>
                 </Button>
             </ThemedView>
             {
                 weatherData && weatherData.weather.length > 0 && (
-                    <ThemedView>
-                        <Card className="w-full">
-                            <CardHeader>
-                                <CardTitle>{weatherData.name}</CardTitle>
-                                <CardDescription>
-                                    {weatherData.weather[0].description}
-                                </CardDescription>
-                                <ThemedView className="flex flex-row gap-2">
-                                    <ThemedView className="flex flex-row items-center gap-1">
-                                        <ArrowDown size={20} color="blue"/>
-                                        <Text className="text-blue-600">
-                                            {weatherData.main.temp_min}°C
+                    isLoading ? (
+                            <View className="inline-flex flex-row items-center px-8 gap-2">
+                                <LoaderCircleIcon color="black" className="animate-spin"/>
+                                <ThemedText>Loading...</ThemedText>
+                            </View>
+                        ) :
+                        <ThemedView>
+                            <Card className="w-full">
+                                <CardHeader>
+                                    <CardTitle>{weatherData.name}</CardTitle>
+                                    <CardDescription>
+                                        {weatherData.weather[0].description}
+                                    </CardDescription>
+                                    <ThemedView className="flex flex-row gap-2">
+                                        <ThemedView className="flex flex-row items-center gap-1">
+                                            <ArrowDown size={20} color="blue"/>
+                                            <Text className="text-blue-600">
+                                                {weatherData.main.temp_min}°C
+                                            </Text>
+                                        </ThemedView>
+                                        <ThemedView className="flex flex-row items-center gap-1">
+                                            <ArrowUp size={20} color="red"/>
+                                            <Text className="text-red-500">
+                                                {weatherData.main.temp_max}°C
+                                            </Text>
+                                        </ThemedView>
+                                    </ThemedView>
+                                </CardHeader>
+                                <CardContent className="flex flex-col items-center">
+                                    <Image
+                                        source={iconMap[iconUrl!]}
+                                        className="size-24"
+                                    />
+                                    <ThemedText type="title">{weatherData.main.temp}°C</ThemedText>
+                                </CardContent>
+                                <CardFooter className="flex flex-row justify-center gap-8">
+                                    <ThemedView className="flex flex-row items-center gap-1 p-1">
+                                        <Droplet size={20} color="black"/>
+                                        <Text>
+                                            {weatherData.main.humidity}%
                                         </Text>
                                     </ThemedView>
-                                    <ThemedView className="flex flex-row items-center gap-1">
-                                        <ArrowUp size={20} color="red"/>
-                                        <Text className="text-red-500">
-                                            {weatherData.main.temp_max}°C
+                                    <ThemedView className="flex flex-row items-center gap-1 p-1">
+                                        <WindIcon size={20} color="black"/>
+                                        <Text>
+                                            {weatherData.wind.speed} km/h
                                         </Text>
                                     </ThemedView>
-                                </ThemedView>
-                            </CardHeader>
-                            <CardContent className="flex flex-col items-center">
-                                <Image
-                                    source={iconMap[iconUrl!]}
-                                    className="size-24"
-                                />
-                                <ThemedText type="title">{weatherData.main.temp}°C</ThemedText>
-                            </CardContent>
-                            <CardFooter className="flex flex-row justify-center gap-8">
-                                <ThemedView className="flex flex-row items-center gap-1 p-1">
-                                    <Droplet size={20} color="black"/>
-                                    <Text>
-                                        {weatherData.main.humidity}%
-                                    </Text>
-                                </ThemedView>
-                                <ThemedView className="flex flex-row items-center gap-1 p-1">
-                                    <WindIcon size={20} color="black"/>
-                                    <Text>
-                                        {weatherData.wind.speed} km/h
-                                    </Text>
-                                </ThemedView>
-                            </CardFooter>
-                        </Card>
-                    </ThemedView>
+                                </CardFooter>
+                            </Card>
+                        </ThemedView>
                 )
             }
 
