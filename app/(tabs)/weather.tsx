@@ -1,11 +1,11 @@
-import {StyleSheet, Image, View} from 'react-native';
+import {StyleSheet, Image, View, RefreshControl} from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
 import {Input} from "@/components/Input";
 import {Button} from "@/components/Button";
 import {Text} from "@/components/Text";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import axios from "axios";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/Card";
 import {
@@ -55,6 +55,7 @@ export default function TabTwoScreen() {
     const [weatherData, setWeatherData] = useState<WeatherData>();
     const [iconUrl, setIconUrl] = useState<string>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [refreshing, setRefreshing] = useState(false);
 
     const iconMap: Record<string, any> = {
         "clouds.png": require('@/assets/images/clouds.png'),
@@ -73,12 +74,17 @@ export default function TabTwoScreen() {
         await axios
             .get(apiURL + city + `&appid=${apiKey}`)
             .then((res) => {
-                console.log(res.data);
                 setWeatherData(res.data);
             })
             .catch(error => console.log(error))
             .finally(() => setIsLoading(false));
     }
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await fetchWeatherDatas();
+        setRefreshing(false);
+    }, []);
 
     useEffect(() => {
         if (!weatherData?.weather || weatherData.weather.length === 0) return;
@@ -104,7 +110,9 @@ export default function TabTwoScreen() {
                     source={require('@/assets/images/weather.jpg')}
                     className="size-full"
                 />
-            }>
+            }
+        >
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
             <ThemedView style={styles.titleContainer}>
                 <ThemedText type="title">Weather</ThemedText>
             </ThemedView>
